@@ -64,25 +64,25 @@ def backtrack(maze, current_var, current_x, current_y):
             print('called 1')
             maze[current_y][current_x - 1] = current_var
             current_x = current_x - 1
+            return backtrack(maze, current_var, current_x, current_y)
 
         elif ( current_y - 1 >= 0 and maze[current_y - 1][current_x] == '_'):
             print('called 2')
             maze[current_y - 1][current_x] = current_var
             current_y = current_y - 1
+            return backtrack(maze, current_var, current_x, current_y)
 
         elif ( current_x + 1 <= len(maze) and maze[current_y][current_x + 1] == '_'):
             print('called 3')
             maze[current_y][current_x + 1] = current_var
             current_x = current_x + 1
+            return backtrack(maze, current_var, current_x, current_y)
 
         elif ( current_y + 1 <= len(maze) and maze[current_y + 1][current_x] == '_'):
             print('called 4')
             maze[current_y + 1][current_x] = current_var
             current_y = current_y + 1
-        else:
-            return
-            
-        backtrack(maze, current_var, current_x, current_y)
+            return backtrack(maze, current_var, current_x, current_y)
 
 def main():
     maze = []
