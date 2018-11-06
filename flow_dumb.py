@@ -3,7 +3,7 @@ import time
 def init_maze(maze):
 
     # Read in the given file line by line until the end of file
-    with open('5x5.txt', 'r') as file:
+    with open('7x7maze.txt', 'r') as file:
         while True:
             line = file.readline()
             if not line:
@@ -80,6 +80,7 @@ def check_finished(maze):
     return True
 
 def zig_zag(maze, current_var, current_x, current_y):
+
     if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == current_var):
         if (current_y - 1 >= 0 and maze[current_x - 1][current_y - 1] == current_var):
             if (current_y - 1 >= 0 and maze[current_y - 1][current_x] == current_var):
@@ -102,77 +103,107 @@ def zig_zag(maze, current_var, current_x, current_y):
 
     return False
 
-def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x, final_y):
+def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x, final_y, i, vars):
     found = False
     if check_finished(maze):
-        return
+        return True
     else:
         print_maze(maze)
+        if (current_y + 1 < len(maze) and (current_x == final_x and current_y + 1 == final_y)):
+            print('Going to next color.')
+            found = find_solution (maze, vars, i+1)
+            # return find_solution (maze, vars, i+1)
+
+        if (current_x + 1 < len(maze) and (current_x + 1 == final_x and current_y == final_y)):
+            print('Going to next color.')
+            found = find_solution (maze, vars, i+1)
+            # return find_solution (maze, vars, i+1)
+
+        if (current_y - 1 >= 0 and (current_x == final_x and current_y - 1 == final_y)):
+            print('Going to next color.')
+            found = find_solution (maze, vars, i+1)
+            # return find_solution (maze, vars, i+1)
+
         if (current_x - 1 >= 0 and (current_x - 1 == final_x and current_y == final_y)):
-            return True
-        elif (current_x - 1 >= 0 and maze[current_y][current_x - 1] == '_'):
+            print('Going to next color.')
+            found = find_solution (maze, vars, i+1)
+            # return find_solution (maze, vars, i+1)
+            
+        if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == '_'):
             print('called left')
             if not zig_zag(maze, current_var, current_x - 1, current_y):
                 maze[current_y][current_x - 1] = current_var
-                found = backtrack(maze, current_var, start_x, start_y, current_x - 1, current_y, final_x, final_y)
+                found = backtrack(maze, current_var, start_x, start_y, current_x - 1, current_y, final_x, final_y, i, vars)
 
-        if (current_y - 1 >= 0 and (current_x == final_x and current_y - 1 == final_y)):
-            return True
-        elif (current_y - 1 >= 0 and maze[current_y - 1][current_x] == '_'):
+        if (current_y - 1 >= 0 and maze[current_y - 1][current_x] == '_'):
             print('called top')
             if not zig_zag(maze, current_var, current_x, current_y - 1):
                 maze[current_y - 1][current_x] = current_var
-                found = backtrack(maze, current_var, start_x, start_y, current_x, current_y - 1, final_x, final_y)
+                found = backtrack(maze, current_var, start_x, start_y, current_x, current_y - 1, final_x, final_y, i, vars)
 
-        if (current_x + 1 < len(maze) and (current_x + 1 == final_x and current_y == final_y)):
-            return True
-        elif (current_x + 1 < len(maze) and maze[current_y][current_x + 1] == '_'):
+        if (current_x + 1 < len(maze) and maze[current_y][current_x + 1] == '_'):
             print('called right')
             if not zig_zag(maze, current_var, current_x + 1, current_y):
                 maze[current_y][current_x + 1] = current_var
-                found = backtrack(maze, current_var, start_x, start_y, current_x + 1, current_y, final_x, final_y)
+                found = backtrack(maze, current_var, start_x, start_y, current_x + 1, current_y, final_x, final_y, i, vars)
 
-        if (current_y + 1 < len(maze) and (current_x == final_x and current_y + 1 == final_y)):
-            return True
-        elif (current_y + 1 < len(maze) and maze[current_y + 1][current_x] == '_'):
+        if (current_y + 1 < len(maze) and maze[current_y + 1][current_x] == '_'):
             print('called down')
             if not zig_zag(maze, current_var, current_x, current_y + 1):
                 maze[current_y + 1][current_x] = current_var
-                found = backtrack(maze, current_var, start_x, start_y, current_x, current_y + 1, final_x, final_y)
+                found = backtrack(maze, current_var, start_x, start_y, current_x, current_y + 1, final_x, final_y, i, vars)
 
         if not found:
             print('start x = ' + str(start_x) + ' & start y = ' + str(start_y))
             print('current x = ' + str(current_x) + ' & current y = ' + str(current_y))
             if not (current_x == start_x and current_y == start_y):
-                print('entered')
+                print('Backing Up')
                 maze[current_y][current_x] = '_'
             return False
 
-        return True
+
+    print('Going to next color.')
+    found = True
+    print_maze(maze)
+    return found
+
+def find_solution (maze, vars, i):
+    print ('Starting color: ' + vars[i])
+    current_coords = find_var_start(maze, vars[i])
+    final_coords = find_var_final(maze, vars[i])
+    current_x = current_coords[0]
+    current_y = current_coords[1]
+    final_x = final_coords[0]
+    final_y = final_coords[1]
+    solution = backtrack(maze, vars[i], current_x, current_y, current_x, current_y, final_x, final_y, i, vars)
+    print ('Finishing color: ' + vars[i])
+    return solution
 
 def main():
     maze = []
     init_maze(maze)
     vars = init_vars(maze)
-    start = find_var_start(maze, vars[0])
-    current_x = start[0]
-    current_y = start[1]
-    final = find_var_final(maze, vars[0])
-    final_x = final[0]
-    final_y = final[1]
 
-    while len(vars) > 0:
-        backtrack(maze, vars[0], current_x, current_y, current_x, current_y, final_x, final_y)
-        print('****Finished Color')
-        vars.remove(vars[0])
-        if len(vars) > 0:
-            current_coords = find_var_start(maze, vars[0])
-            final_coords = find_var_final(maze, vars[0])
-            current_x = current_coords[0]
-            current_y = current_coords[1]
-            final_x = final_coords[0]
-            final_y = final_coords[1]
-        else:
-            break
+    find_solution(maze, vars, 0)
+    # start = find_var_start(maze, vars[0])
+    # current_x = start[0]
+    # current_y = start[1]
+    # final = find_var_final(maze, vars[0])
+    # final_x = final[0]
+    # final_y = final[1]
+    #
+    # while len(vars) > 0:
+    #     backtrack(maze, vars[0], current_x, current_y, current_x, current_y, final_x, final_y)
+    #     print('****Finished Color')
+    #     vars.remove(vars[0])
+    #     if len(vars) > 0:
+    #         current_coords = find_var_start(maze, vars[0])
+    #         final_coords = find_var_final(maze, vars[0])
+    #         current_x = current_coords[0]
+    #         current_y = current_coords[1]
+    #         final_x = final_coords[0]
+    #         final_y = final_coords[1]
+    #     else:
+    #         break
 
 main()
