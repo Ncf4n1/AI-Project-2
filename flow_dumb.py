@@ -3,7 +3,7 @@ import time
 def init_maze(maze):
 
     # Read in the given file line by line until the end of file
-    with open('7x7maze.txt', 'r') as file:
+    with open('8x8maze.txt', 'r') as file:
         while True:
             line = file.readline()
             if not line:
@@ -82,7 +82,7 @@ def check_finished(maze):
 def zig_zag(maze, current_var, current_x, current_y):
 
     if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == current_var):
-        if (current_y - 1 >= 0 and maze[current_x - 1][current_y - 1] == current_var):
+        if (current_y - 1 >= 0 and maze[current_y - 1][current_x - 1] == current_var):
             if (current_y - 1 >= 0 and maze[current_y - 1][current_x] == current_var):
                 return True
 
@@ -128,7 +128,7 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
             print('Going to next color.')
             found = find_solution (maze, vars, i+1)
             # return find_solution (maze, vars, i+1)
-            
+
         if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == '_'):
             print('called left')
             if not zig_zag(maze, current_var, current_x - 1, current_y):
