@@ -86,7 +86,7 @@ def check_finished(maze):
 def zig_zag(maze, current_var, current_x, current_y):
 
     if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == current_var):
-        if (current_y - 1 >= 0 and maze[current_x - 1][current_y - 1] == current_var):
+        if (current_y - 1 >= 0 and maze[current_y - 1][current_x - 1] == current_var):
             if (current_y - 1 >= 0 and maze[current_y - 1][current_x] == current_var):
                 return True
 
@@ -160,7 +160,7 @@ def a_star(maze, var):
         # Goal check the right node
         # If not a goal, then calculate the sum of the distance to goal plus
         # the path cost to the current position
-        if (current_x + 1 < len(maze) and (current_x + 1 == final_x and current_y == final_y):
+        if (current_x + 1 < len(maze) and (current_x + 1 == final_x and current_y == final_y)):
             goal = True
             break
         elif (maze[current_y][current_x + 1] == '_'):
@@ -185,7 +185,7 @@ def a_star(maze, var):
 
         # Update the old position with a '.' and update the current position
         # Update the the path cost of the old position as well
-        if len(heapq) > 0
+        if len(heapq) > 0:
             current_tuple = heapq.heappop(a_pqueue)
             a_expanded += 1
             maze[current_y][current_x] = '.'

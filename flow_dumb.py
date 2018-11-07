@@ -1,7 +1,7 @@
 def init_maze(maze):
 
     # Read in the given file line by line until the end of file
-    with open('5x5.txt', 'r') as file:
+    with open('10x10maze.txt', 'r') as file:
         while True:
             line = file.readline()
             if not line:
