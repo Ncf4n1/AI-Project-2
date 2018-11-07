@@ -1,3 +1,5 @@
+import heapq
+
 def init_maze(maze):
 
     # Read in the given file line by line until the end of file
@@ -26,6 +28,7 @@ def init_vars(maze):
     return csp_vars
 
 def restore_maze(maze):
+    print('called')
     for line in maze:
         for item in line:
             if item == 'c':
@@ -110,91 +113,64 @@ def zig_zag(maze, current_var, current_x, current_y):
 
     return False
 
-# Function to use the A* Search Algorithm
-def a_star(maze, var):
+# Function to use the Greedy Best First Search Algorithm
+def greedy_best_first(maze, current_x, current_y, final_x, final_y):
 
     # Priority Queue used by the Greedy algorithm
-    a_pqueue = []
-
-    # First find the location of the 'P' starting spot in maze
-    # Then add it to the priority queue
-    current_coords = find_var_start(maze, var)
-    current_y = current_coords[1]
-    current_x = current_coords[0]
-
-    # Then find the location of the '*' starting spot in maze
-    # Then add it to the priority queue
-    final_coords = find_var_final(maze, var)
-    final_y = final_coords[1]
-    final_x = final_coords[0]
-    goal = False
-    old_path_traveled = 0
+    g_pqueue = []
+    g_path_cost = 0
 
     # Check and expand nodes (Clockwise Left to Right)
     # Continue checking until the goal is reached
-    while (not goal):
+    while True:
 
-        # First goal check the left node
-        # If not a goal, then calculate the sum of the distance to goal plus
-        # the path cost to the current position
+        # First goal check the left node and if it matches, print path cost
+        # If not a goal, then calculate its distance to goal and add it to the PQ
         if (current_x - 1 >= 0 and (current_x - 1 == final_x and current_y == final_y)):
-            goal = True
-            break
-        elif (maze[current_y][current_x - 1] == '_'):
-            path_traveled = old_path_traveled + 1
-            path_to_go = distance_to_go(current_x - 1, current_y, final_x, final_y)
-            path = path_traveled + path_to_go
-            heapq.heappush(a_pqueue, (path, path_traveled, [current_y, current_x - 1]))
-            maze[current_y][current_x] = 'c'
+            restore_maze(maze)
+            return True
+        elif (current_x - 1 >= 0 and maze[current_y][current_x - 1] == '_'):
+            path = distance_to_go(current_x - 1, current_y, final_x, final_y)
+            heapq.heappush(g_pqueue, (path, [current_y, current_x - 1], g_path_cost + 1))
+            maze[current_y][current_x - 1] = 'c'
 
-        # Then goal check the top node
-        # If not a goal, then calculate the sum of the distance to goal plus
-        # the path cost to the current position
+        # Then goal check the top node and if it matches, print path cost
+        # If not a goal, then calculate its distance to goal and add it to the PQ
         if (current_y - 1 >= 0 and (current_x == final_x and current_y - 1 == final_y)):
-            goal = True
-            break
-        elif (maze[current_y - 1][current_x] == '_'):
-            path_traveled = old_path_traveled + 1
-            path_to_go = distance_to_go(current_x, current_y - 1, final_x, final_y)
-            path = path_traveled + path_to_go
-            heapq.heappush(a_pqueue, (path, path_traveled, [current_y - 1, current_x]))
+            restore_maze(maze)
+            return True
+        elif (current_y - 1 >= 0 and maze[current_y - 1][current_x] == '_'):
+            path = distance_to_go(current_x, current_y - 1, final_x, final_y)
+            heapq.heappush(g_pqueue, (path, [current_y - 1, current_x], g_path_cost + 1))
             maze[current_y - 1][current_x] = 'c'
 
-        # Goal check the right node
-        # If not a goal, then calculate the sum of the distance to goal plus
-        # the path cost to the current position
+        # Goal check the right node and if it matches, print path cost
+        # If not a goal, then calculate its distance to goal and add it to the PQ
         if (current_x + 1 < len(maze) and (current_x + 1 == final_x and current_y == final_y)):
-            goal = True
-            break
-        elif (maze[current_y][current_x + 1] == '_'):
-            path_traveled = old_path_traveled + 1
-            path_to_go = distance_to_go(current_x + 1, current_y, final_x, final_y)
-            path = path_traveled + path_to_go
-            heapq.heappush(a_pqueue, (path, path_traveled, [current_y, current_x + 1]))
+            restore_maze(maze)
+            return True
+        elif (current_x + 1 < len(maze) and maze[current_y][current_x + 1] == '_'):
+            path = distance_to_go(current_x + 1, current_y, final_x, final_y)
+            heapq.heappush(g_pqueue, (path, [current_y, current_x + 1], g_path_cost + 1))
             maze[current_y][current_x + 1] = 'c'
 
-        # Finally goal check the bottom node
-        # If not a goal, then calculate the sum of the distance to goal plus
-        # the path cost to the current position
-        if (current_y + 1 < len(maze) and (current_x == final_x and current_y == final_y)):
-            goal = True
-            break
-        elif (maze[current_y + 1][current_x] == ' '):
-            path_traveled = old_path_traveled + 1
-            path_to_go = distance_to_go(current_x, current_y + 1, final_x, final_y)
-            path = path_traveled + path_to_go
-            heapq.heappush(a_pqueue, (path, path_traveled, [current_y + 1, current_x]))
+        # Finally goal check the bottom node and if it matches, print path cost
+        # If not a goal, then calculate its distance to goal and add it to the PQ
+        if (current_y + 1 < len(maze) and (current_x == final_x and current_y + 1 == final_y)):
+            restore_maze(maze)
+            return True
+        elif (current_y + 1 < len(maze) and maze[current_y + 1][current_x] == '_'):
+            path = distance_to_go(current_x, current_y + 1, final_x, final_y)
+            heapq.heappush(g_pqueue, (path, [current_y + 1, current_x], g_path_cost + 1))
             maze[current_y + 1][current_x] = 'c'
 
         # Update the old position with a '.' and update the current position
-        # Update the the path cost of the old position as well
-        if len(heapq) > 0:
-            current_tuple = heapq.heappop(a_pqueue)
-            a_expanded += 1
-            maze[current_y][current_x] = '.'
-            current_x = current_tuple[2][1]
-            current_y = current_tuple[2][0]
-            old_path_traveled = current_tuple[1]
+        # Also update the expanded node count and the node path cost
+        if len(g_pqueue) > 0:
+            current_node = heapq.heappop(g_pqueue)
+            current_x = current_node[1][1]
+            current_y = current_node[1][0]
+            g_path_cost = current_node[2]
         else:
             restore_maze(maze)
             return False
@@ -257,7 +233,7 @@ def find_solution (maze, vars, i):
     current_y = current_coords[1]
     final_x = final_coords[0]
     final_y = final_coords[1]
-    if a_star(maze, vars[i]):
+    if greedy_best_first(maze, current_x, current_y, final_x, final_y):
         solution = backtrack(maze, vars[i], current_x, current_y, current_x, current_y, final_x, final_y, i, vars)
     else:
         return False
