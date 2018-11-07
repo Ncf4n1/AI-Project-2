@@ -28,11 +28,10 @@ def init_vars(maze):
     return csp_vars
 
 def restore_maze(maze):
-    print('called')
-    for line in maze:
-        for item in line:
-            if item == 'c':
-                item = '_'
+    for y in range(0, len(maze)):
+        for x in range(0, len(maze)):
+            if maze[y][x] == 'c':
+                maze[y][x] = '_'
 
 def find_var_start(maze, var):
     start_x = 0
