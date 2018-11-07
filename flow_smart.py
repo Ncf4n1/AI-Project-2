@@ -83,6 +83,9 @@ def check_finished(maze):
 
     return True
 
+def distance_to_go(current_x, current_y, final_x, final_y):
+    return ( abs(current_x - final_x) ) + ( abs( ( -current_y ) - ( -final_y ) ) )
+
 def zig_zag(maze, current_var, current_x, current_y):
 
     if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == current_var):
@@ -139,7 +142,7 @@ def a_star(maze, var):
             break
         elif (maze[current_y][current_x - 1] == '_'):
             path_traveled = old_path_traveled + 1
-            path_to_go = distance_to_go(current_x - 1, current_y, star_x, star_y)
+            path_to_go = distance_to_go(current_x - 1, current_y, final_x, final_y)
             path = path_traveled + path_to_go
             heapq.heappush(a_pqueue, (path, path_traveled, [current_y, current_x - 1]))
             maze[current_y][current_x] = 'c'
@@ -152,7 +155,7 @@ def a_star(maze, var):
             break
         elif (maze[current_y - 1][current_x] == '_'):
             path_traveled = old_path_traveled + 1
-            path_to_go = distance_to_go(current_x, current_y - 1, star_x, star_y)
+            path_to_go = distance_to_go(current_x, current_y - 1, final_x, final_y)
             path = path_traveled + path_to_go
             heapq.heappush(a_pqueue, (path, path_traveled, [current_y - 1, current_x]))
             maze[current_y - 1][current_x] = 'c'
@@ -165,7 +168,7 @@ def a_star(maze, var):
             break
         elif (maze[current_y][current_x + 1] == '_'):
             path_traveled = old_path_traveled + 1
-            path_to_go = distance_to_go(current_x + 1, current_y, star_x, star_y)
+            path_to_go = distance_to_go(current_x + 1, current_y, final_x, final_y)
             path = path_traveled + path_to_go
             heapq.heappush(a_pqueue, (path, path_traveled, [current_y, current_x + 1]))
             maze[current_y][current_x + 1] = 'c'
@@ -178,7 +181,7 @@ def a_star(maze, var):
             break
         elif (maze[current_y + 1][current_x] == ' '):
             path_traveled = old_path_traveled + 1
-            path_to_go = distance_to_go(current_x, current_y + 1, star_x, star_y)
+            path_to_go = distance_to_go(current_x, current_y + 1, final_x, final_y)
             path = path_traveled + path_to_go
             heapq.heappush(a_pqueue, (path, path_traveled, [current_y + 1, current_x]))
             maze[current_y + 1][current_x] = 'c'
