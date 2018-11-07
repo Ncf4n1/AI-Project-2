@@ -1,7 +1,11 @@
 def init_maze(maze):
 
     # Read in the given file line by line until the end of file
+<<<<<<< HEAD
     with open('5x5.txt', 'r') as file:
+=======
+    with open('8x8maze.txt', 'r') as file:
+>>>>>>> b11b26612d04481a841ed8ab7f38e231ddb375f8
         while True:
             line = file.readline()
             if not line:
@@ -121,6 +125,10 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
 
         if (current_x - 1 >= 0 and (current_x - 1 == final_x and current_y == final_y)):
             found = find_solution (maze, vars, i+1)
+<<<<<<< HEAD
+=======
+            # return find_solution (maze, vars, i+1)
+>>>>>>> b11b26612d04481a841ed8ab7f38e231ddb375f8
 
         if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == '_'):
             print('called left')
