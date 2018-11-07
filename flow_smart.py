@@ -4,7 +4,7 @@ import time
 def init_maze(maze):
 
     # Read in the given file line by line until the end of file
-    with open('5x5.txt', 'r') as file:
+    with open('9x9maze.txt', 'r') as file:
         while True:
             line = file.readline()
             if not line:
@@ -67,7 +67,10 @@ def find_var_final(maze, var):
 
             if item == '_' or item != var:
                 final_x += 1
-            else:
+            elif count == 0 and item == var:
+                final_x += 1
+                count += 1
+            elif count == 1 and item == var:
                 found_item = True
                 count += 1
                 break
@@ -172,6 +175,7 @@ def greedy_best_first(maze, current_x, current_y, final_x, final_y):
             current_y = current_node[1][0]
             g_path_cost = current_node[2]
         else:
+            print('*********CALLED************')
             restore_maze(maze)
             return False
 
