@@ -1,4 +1,5 @@
 import heapq
+import time
 
 def init_maze(maze):
 
@@ -179,7 +180,6 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
     if check_finished(maze):
         return True
     else:
-        print_maze(maze)
         if (current_y + 1 < len(maze) and (current_x == final_x and current_y + 1 == final_y)):
             found = find_solution (maze, vars, i+1)
 
@@ -193,25 +193,25 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
             found = find_solution (maze, vars, i+1)
 
         if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == '_'):
-            print('called left')
+            #print('called left')
             if not zig_zag(maze, current_var, current_x - 1, current_y):
                 maze[current_y][current_x - 1] = current_var
                 found = backtrack(maze, current_var, start_x, start_y, current_x - 1, current_y, final_x, final_y, i, vars)
 
         if (current_y - 1 >= 0 and maze[current_y - 1][current_x] == '_'):
-            print('called top')
+            #print('called top')
             if not zig_zag(maze, current_var, current_x, current_y - 1):
                 maze[current_y - 1][current_x] = current_var
                 found = backtrack(maze, current_var, start_x, start_y, current_x, current_y - 1, final_x, final_y, i, vars)
 
         if (current_x + 1 < len(maze) and maze[current_y][current_x + 1] == '_'):
-            print('called right')
+            #print('called right')
             if not zig_zag(maze, current_var, current_x + 1, current_y):
                 maze[current_y][current_x + 1] = current_var
                 found = backtrack(maze, current_var, start_x, start_y, current_x + 1, current_y, final_x, final_y, i, vars)
 
         if (current_y + 1 < len(maze) and maze[current_y + 1][current_x] == '_'):
-            print('called down')
+            #print('called down')
             if not zig_zag(maze, current_var, current_x, current_y + 1):
                 maze[current_y + 1][current_x] = current_var
                 found = backtrack(maze, current_var, start_x, start_y, current_x, current_y + 1, final_x, final_y, i, vars)
@@ -221,11 +221,11 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
                 maze[current_y][current_x] = '_'
             return False
     found = True
-    print_maze(maze)
     return found
 
 def find_solution (maze, vars, i):
     print ('Starting color: ' + vars[i])
+    print_maze(maze)
     current_coords = find_var_start(maze, vars[i])
     final_coords = find_var_final(maze, vars[i])
     current_x = current_coords[0]
@@ -237,6 +237,7 @@ def find_solution (maze, vars, i):
     else:
         return False
     print ('Finishing color: ' + vars[i])
+    print_maze(maze)
     return solution
 
 def main():
@@ -246,4 +247,8 @@ def main():
 
     find_solution(maze, vars, 0)
 
+time1 = time.time()
 main()
+time2 = time.time()
+run_time = time2 - time1
+print('Run time in seconds = ' + str(run_time))
