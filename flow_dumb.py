@@ -1,9 +1,7 @@
-import time
-
 def init_maze(maze):
 
     # Read in the given file line by line until the end of file
-    with open('7x7maze.txt', 'r') as file:
+    with open('5x5.txt', 'r') as file:
         while True:
             line = file.readline()
             if not line:
@@ -60,7 +58,10 @@ def find_var_final(maze, var):
 
             if item == '_' or item != var:
                 final_x += 1
-            else:
+            elif count == 0 and item == var:
+                final_x += 1
+                count += 1
+            elif count == 1 and item == var:
                 found_item = True
                 count += 1
                 break
@@ -82,7 +83,7 @@ def check_finished(maze):
 def zig_zag(maze, current_var, current_x, current_y):
 
     if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == current_var):
-        if (current_y - 1 >= 0 and maze[current_x - 1][current_y - 1] == current_var):
+        if (current_y - 1 >= 0 and maze[current_y - 1][current_x - 1] == current_var):
             if (current_y - 1 >= 0 and maze[current_y - 1][current_x] == current_var):
                 return True
 
@@ -110,25 +111,17 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
     else:
         print_maze(maze)
         if (current_y + 1 < len(maze) and (current_x == final_x and current_y + 1 == final_y)):
-            print('Going to next color.')
             found = find_solution (maze, vars, i+1)
-            # return find_solution (maze, vars, i+1)
 
         if (current_x + 1 < len(maze) and (current_x + 1 == final_x and current_y == final_y)):
-            print('Going to next color.')
             found = find_solution (maze, vars, i+1)
-            # return find_solution (maze, vars, i+1)
 
         if (current_y - 1 >= 0 and (current_x == final_x and current_y - 1 == final_y)):
-            print('Going to next color.')
             found = find_solution (maze, vars, i+1)
-            # return find_solution (maze, vars, i+1)
 
         if (current_x - 1 >= 0 and (current_x - 1 == final_x and current_y == final_y)):
-            print('Going to next color.')
             found = find_solution (maze, vars, i+1)
-            # return find_solution (maze, vars, i+1)
-            
+
         if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == '_'):
             print('called left')
             if not zig_zag(maze, current_var, current_x - 1, current_y):
@@ -154,15 +147,11 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
                 found = backtrack(maze, current_var, start_x, start_y, current_x, current_y + 1, final_x, final_y, i, vars)
 
         if not found:
-            print('start x = ' + str(start_x) + ' & start y = ' + str(start_y))
-            print('current x = ' + str(current_x) + ' & current y = ' + str(current_y))
             if not (current_x == start_x and current_y == start_y):
-                print('Backing Up')
                 maze[current_y][current_x] = '_'
             return False
 
 
-    print('Going to next color.')
     found = True
     print_maze(maze)
     return found
@@ -173,6 +162,7 @@ def find_solution (maze, vars, i):
     final_coords = find_var_final(maze, vars[i])
     current_x = current_coords[0]
     current_y = current_coords[1]
+    print(final_coords)
     final_x = final_coords[0]
     final_y = final_coords[1]
     solution = backtrack(maze, vars[i], current_x, current_y, current_x, current_y, final_x, final_y, i, vars)
@@ -185,25 +175,5 @@ def main():
     vars = init_vars(maze)
 
     find_solution(maze, vars, 0)
-    # start = find_var_start(maze, vars[0])
-    # current_x = start[0]
-    # current_y = start[1]
-    # final = find_var_final(maze, vars[0])
-    # final_x = final[0]
-    # final_y = final[1]
-    #
-    # while len(vars) > 0:
-    #     backtrack(maze, vars[0], current_x, current_y, current_x, current_y, final_x, final_y)
-    #     print('****Finished Color')
-    #     vars.remove(vars[0])
-    #     if len(vars) > 0:
-    #         current_coords = find_var_start(maze, vars[0])
-    #         final_coords = find_var_final(maze, vars[0])
-    #         current_x = current_coords[0]
-    #         current_y = current_coords[1]
-    #         final_x = final_coords[0]
-    #         final_y = final_coords[1]
-    #     else:
-    #         break
 
 main()
