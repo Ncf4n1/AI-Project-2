@@ -1,7 +1,9 @@
+import time
+
 def init_maze(maze):
 
     # Read in the given file line by line until the end of file
-    with open('10x10maze.txt', 'r') as file:
+    with open('9x9maze.txt', 'r') as file:
         while True:
             line = file.readline()
             if not line:
@@ -176,4 +178,8 @@ def main():
 
     find_solution(maze, vars, 0)
 
+time1 = time.time()
 main()
+time2 = time.time()
+run_time = time2 - time1
+print('Run time in seconds = ' + str(run_time))
