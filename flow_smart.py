@@ -1,5 +1,6 @@
 import heapq
 import time
+from collections import OrderedDict
 
 ####################################################
 # Function that sets up the maze into a 2D List
@@ -28,13 +29,38 @@ def print_maze(maze):
 # Helper function that initializes the list of colors
 def init_vars(maze):
     csp_vars = []
-    for line in maze:
-        for item in line:
-            if item != '_' and item != '\n' and item not in csp_vars:
-                csp_vars.append(item)
+    vars_exits = []
+    for y in range(0, len(maze)):
+        for x in range(0, len(maze)):
+            if maze[y][x] != '_' and maze[y][x] != '\n' and maze[y][x] not in csp_vars:
+                exits = find_exits(maze, x, y)
+                heapq.heappush(vars_exits, (exits, maze[y][x], (x, y)))
 
+    csp_vars.append((vars_exits[0][1], vars_exits[0][2]))
+    for (exit, color, coords) in vars_exits:
+        present = False
+        for tuple in csp_vars:
+            if color in tuple:
+                present = True
+        if not present:
+            csp_vars.append((color, coords))
+    
     return csp_vars
 
+
+def find_exits(maze, current_x, current_y):
+    exits = 0
+    if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == '_'):
+        exits += 1
+    if (current_y - 1 >= 0 and maze[current_y - 1][current_x] == '_'):
+        exits += 1
+    if (current_x + 1 < len(maze) and maze[current_y][current_x + 1] == '_'):
+        exits += 1
+    if (current_y + 1 < len(maze) and maze[current_y + 1][current_x] == '_'):
+        exits += 1
+    
+    return exits
+    
 
 #################################################
 # Function used by Greedy search forward check
@@ -45,60 +71,15 @@ def restore_maze(maze):
             if maze[y][x] == 'c':
                 maze[y][x] = '_'
 
-
-################################################
-# Helper function that finds the starting coordinates
-# of a given color
-def find_var_start(maze, var):
-    start_x = 0
-    start_y = 0
-
-    for line in maze:
-        for item in line:
-            found_item = False
-
-            if item == '_' or item != var:
-                start_x += 1
-            else:
-                found_item = True
-                break
-
-        if not found_item:
-            start_y += 1
-            start_x = 0
-        else:
-            return [start_x, start_y]
-
-    return None
-
-
 #############################################
 # Helper function that finds the finishing
 # coordinates for a given color
-def find_var_final(maze, var):
-    final_x = 0
-    final_y = 0
-    count = 0
+def find_var_final(maze, var, start_x, start_y):
 
-    for line in maze:
-        for item in line:
-            found_item = False
-
-            if item == '_' or item != var:
-                final_x += 1
-            elif count == 0 and item == var:
-                final_x += 1
-                count += 1
-            elif count == 1 and item == var:
-                found_item = True
-                count += 1
-                break
-
-        if not found_item or count < 2:
-            final_y += 1
-            final_x = 0
-        else:
-            return [final_x, final_y]
+    for y in range(0, len(maze)):
+        for x in range(0, len(maze)):
+            if (maze[y][x] == var and (x != start_x or y != start_y)):
+                return [x, y]
 
 
 ########################################
@@ -326,22 +307,19 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
 
         # Move on to check if space to the left is open
         if (current_x - 1 >= 0 and maze[current_y][current_x - 1] == '_'):
-            #print('called left')
             no_solution = False
             
             # If moving to this space does not create a zig zag and does not make a dead end...
             if not zig_zag(maze, current_var, current_x - 1, current_y) and not make_dead_end(maze, current_x - 1, current_y, current_var):
                 maze[current_y][current_x - 1] = current_var
-                #print_maze(maze)
                 
                 # Move to this space, then run the forward check greedy search
                 # This ensures that every other color can reach its goal still
                 # If a color fails this test, backtrack immediately
                 for color in range(i+1, len(vars)):
-                    temps_coords = find_var_start(maze, vars[color])
-                    temps_x = temps_coords[0]
-                    temps_y = temps_coords[1]
-                    tempf_coords = find_var_final(maze, vars[color])
+                    temps_x = vars[color][1][0]
+                    temps_y = vars[color][1][1]
+                    tempf_coords = find_var_final(maze, vars[color][0], temps_x, temps_y)
                     tempf_x = tempf_coords[0]
                     tempf_y = tempf_coords[1]
 
@@ -354,22 +332,19 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
 
         # Then check the space above to see if it is open
         if (current_y - 1 >= 0 and maze[current_y - 1][current_x] == '_'):
-            #print('called top')
             no_solution = False
             
             # If moving to this space does not create a zig zag and does not make a dead end...
             if not zig_zag(maze, current_var, current_x, current_y - 1) and not make_dead_end(maze, current_x, current_y - 1, current_var):
                 maze[current_y - 1][current_x] = current_var
-                #print_maze(maze)
                 
                 # Move to this space, then run the forward check greedy search
                 # This ensures that every other color can reach its goal still
                 # If a color fails this test, backtrack immediately
                 for color in range(i+1, len(vars)):
-                    temps_coords = find_var_start(maze, vars[color])
-                    temps_x = temps_coords[0]
-                    temps_y = temps_coords[1]
-                    tempf_coords = find_var_final(maze, vars[color])
+                    temps_x = vars[color][1][0]
+                    temps_y = vars[color][1][1]
+                    tempf_coords = find_var_final(maze, vars[color][0], temps_x, temps_y)
                     tempf_x = tempf_coords[0]
                     tempf_y = tempf_coords[1]
 
@@ -383,22 +358,19 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
 
         # Then check the space to the right to see if it is open
         if (current_x + 1 < len(maze) and maze[current_y][current_x + 1] == '_'):
-            #print('called right')
             no_solution = False
             
             # If moving to this space does not create a zig zag and does not make a dead end...
             if not zig_zag(maze, current_var, current_x + 1, current_y) and not make_dead_end(maze, current_x + 1, current_y, current_var):
                 maze[current_y][current_x + 1] = current_var
-                #print_maze(maze)
                 
                 # Move to this space, then run the forward check greedy search
                 # This ensures that every other color can reach its goal still
                 # If a color fails this test, backtrack immediately
                 for color in range(i+1, len(vars)):
-                    temps_coords = find_var_start(maze, vars[color])
-                    temps_x = temps_coords[0]
-                    temps_y = temps_coords[1]
-                    tempf_coords = find_var_final(maze, vars[color])
+                    temps_x = vars[color][1][0]
+                    temps_y = vars[color][1][1]
+                    tempf_coords = find_var_final(maze, vars[color][0], temps_x, temps_y)
                     tempf_x = tempf_coords[0]
                     tempf_y = tempf_coords[1]
 
@@ -411,22 +383,19 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
 
         # Finally, check to see if the space below the current position is open
         if (current_y + 1 < len(maze) and maze[current_y + 1][current_x] == '_'):
-            #print('called down')
             no_solution = False
             
             # If moving to this space does not create a zig zag and does not make a dead end...
             if not zig_zag(maze, current_var, current_x, current_y + 1) and not make_dead_end(maze, current_x, current_y + 1, current_var):
                 maze[current_y + 1][current_x] = current_var
-                #print_maze(maze)
                 
                 # Move to this space, then run the forward check greedy search
                 # This ensures that every other color can reach its goal still
                 # If a color fails this test, backtrack immediately
                 for color in range(i+1, len(vars)):
-                    temps_coords = find_var_start(maze, vars[color])
-                    temps_x = temps_coords[0]
-                    temps_y = temps_coords[1]
-                    tempf_coords = find_var_final(maze, vars[color])
+                    temps_x = vars[color][1][0]
+                    temps_y = vars[color][1][1]
+                    tempf_coords = find_var_final(maze, vars[color][0], temps_x, temps_y)
                     tempf_x = tempf_coords[0]
                     tempf_y = tempf_coords[1]
 
@@ -452,22 +421,15 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
 # the recursion stacks of the different colors
 # in the maze
 def find_solution (maze, vars, i):
-    #print ('Starting color: ' + vars[i])
-    #print_maze(maze)
-    #time.sleep(5)
-    current_coords = find_var_start(maze, vars[i])
-    final_coords = find_var_final(maze, vars[i])
-    current_x = current_coords[0]
-    current_y = current_coords[1]
+    current_x = vars[i][1][0]
+    current_y = vars[i][1][1]
+    final_coords = find_var_final(maze, vars[i][0], current_x, current_y)
     final_x = final_coords[0]
     final_y = final_coords[1]
     if greedy_best_first(maze, current_x, current_y, final_x, final_y):
-        solution = backtrack(maze, vars[i], current_x, current_y, current_x, current_y, final_x, final_y, i, vars)
+        solution = backtrack(maze, vars[i][0], current_x, current_y, current_x, current_y, final_x, final_y, i, vars)
     else:
         return False
-    #print ('Finishing color: ' + vars[i])
-    #print_maze(maze)
-    #time.sleep(5)
     return solution
 
 ########################################
@@ -488,7 +450,6 @@ def main():
         print('Enter 9 for 9x9 maze')
         print('Enter 10 for 10x10 maze')
         print('Enter 12 for 12x12 maze')
-        print('Enter 14 for 14x14 maze')
         print('\n')
         name = input('Please select a maze: ')
         
@@ -514,10 +475,6 @@ def main():
             
         elif (name == '12'):
             init_maze(maze, '12x12maze.txt')
-            break
-            
-        elif (name == '14'):
-            init_maze(maze, '14x14maze.txt')
             break
             
         else:
