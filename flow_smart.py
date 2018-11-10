@@ -1,6 +1,5 @@
 import heapq
 import time
-from collections import OrderedDict
 
 ####################################################
 # Function that sets up the maze into a 2D List
@@ -439,7 +438,7 @@ def find_solution (maze, vars, i):
 def main():
     maze = []
     
-    # Menu that user 
+    # Menu that allows user to select a maze to run
     while True:
         print('Automated Flow Free Solver')
         print('---------------------------')
