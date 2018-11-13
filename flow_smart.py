@@ -1,6 +1,9 @@
 import heapq
 import time
 
+assignments = 0     # Variable for the number of attempted assignments
+
+
 ####################################################
 # Function that sets up the maze into a 2D List
 def init_maze(maze, filename):
@@ -24,6 +27,24 @@ def print_maze(maze):
         print('\n')
 
 
+#####################################
+# Helper function to write the puzzle
+# solution to an output file
+def write_to_file(maze, runtime, assignments):
+    
+    # Write out to a new output file
+    file = open('maze_output.txt', 'a')
+    for line in maze:
+        for item in line:
+            file.write(item)
+    file.write('\n')
+    file.write('Number of attempted assignments = ' + str(assignments) + '\n')
+    file.write('Run time in seconds: ' + str(runtime))
+    file.write('\n')
+    file.write('\n')
+    file.write('\n')
+    
+    
 #################################################
 # Helper function that initializes the list of colors
 def init_vars(maze):
@@ -239,6 +260,7 @@ def greedy_best_first(maze, current_x, current_y, final_x, final_y):
 # the maze trying to find a solution
 def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x, final_y, i, vars):
     found = False
+    global assignments
     
     # First check if the maze is completed and we can stop
     if check_finished(maze):
@@ -310,6 +332,7 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
             
             # If moving to this space does not create a zig zag and does not make a dead end...
             if not zig_zag(maze, current_var, current_x - 1, current_y) and not make_dead_end(maze, current_x - 1, current_y, current_var):
+                assignments += 1
                 maze[current_y][current_x - 1] = current_var
                 
                 # Move to this space, then run the forward check greedy search
@@ -335,6 +358,7 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
             
             # If moving to this space does not create a zig zag and does not make a dead end...
             if not zig_zag(maze, current_var, current_x, current_y - 1) and not make_dead_end(maze, current_x, current_y - 1, current_var):
+                assignments += 1
                 maze[current_y - 1][current_x] = current_var
                 
                 # Move to this space, then run the forward check greedy search
@@ -361,6 +385,7 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
             
             # If moving to this space does not create a zig zag and does not make a dead end...
             if not zig_zag(maze, current_var, current_x + 1, current_y) and not make_dead_end(maze, current_x + 1, current_y, current_var):
+                assignments += 1
                 maze[current_y][current_x + 1] = current_var
                 
                 # Move to this space, then run the forward check greedy search
@@ -386,6 +411,7 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
             
             # If moving to this space does not create a zig zag and does not make a dead end...
             if not zig_zag(maze, current_var, current_x, current_y + 1) and not make_dead_end(maze, current_x, current_y + 1, current_var):
+                assignments += 1
                 maze[current_y + 1][current_x] = current_var
                 
                 # Move to this space, then run the forward check greedy search
@@ -437,6 +463,7 @@ def find_solution (maze, vars, i):
 # and begins the searching
 def main():
     maze = []
+    global assignments
     
     # Menu that allows user to select a maze to run
     while True:
@@ -486,9 +513,10 @@ def main():
     time2 = time.time()
     run_time = time2 - time1
     print('\n')
+    print('Number of attempted assignments = ' + str(assignments))
     print('Run time in seconds = ' + str(run_time))
     print('\n')
     print_maze(maze)
-
+    write_to_file(maze, run_time, assignments)
 
 main()

@@ -1,6 +1,8 @@
 import time
 
 
+assignments = 0     # Variable for the number of attempted assignments
+
 #############################
 # Helper function to initliaze the text file
 # into a 2D maze
@@ -15,6 +17,24 @@ def init_maze(maze, filename):
             maze.append(list(line))
 
 
+#####################################
+# Helper function to write the puzzle
+# solution to an output file
+def write_to_file(maze, runtime, assignments):
+    
+    # Write out to a new output file
+    file = open('maze_output.txt', 'a')
+    for line in maze:
+        for item in line:
+            file.write(item)
+    file.write('\n')
+    file.write('Number of attempted assignments = ' + str(assignments) + '\n')
+    file.write('Run time in seconds: ' + str(runtime))
+    file.write('\n')
+    file.write('\n')
+    file.write('\n')
+        
+        
 ##############################################
 # Helper function that prints out the given maze
 def print_maze(maze):
@@ -136,6 +156,7 @@ def zig_zag(maze, current_var, current_x, current_y):
 # for a solution for the given maze
 def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x, final_y, i, vars):
     found = False
+    global assignments
     
     # Base Case: Check if the maze was completed
     if check_finished(maze):
@@ -169,24 +190,28 @@ def backtrack(maze, current_var, start_x, start_y, current_x, current_y, final_x
             if not zig_zag(maze, current_var, current_x - 1, current_y):
                 
                 # If not move there and recursively move on
+                assignments += 1
                 maze[current_y][current_x - 1] = current_var
                 found = backtrack(maze, current_var, start_x, start_y, current_x - 1, current_y, final_x, final_y, i, vars)
 
         # Repeat the above process for the space above
         if (current_y - 1 >= 0 and maze[current_y - 1][current_x] == '_'):
             if not zig_zag(maze, current_var, current_x, current_y - 1):
+                assignments += 1
                 maze[current_y - 1][current_x] = current_var
                 found = backtrack(maze, current_var, start_x, start_y, current_x, current_y - 1, final_x, final_y, i, vars)
 
         # Repeat again for the space to the right
         if (current_x + 1 < len(maze) and maze[current_y][current_x + 1] == '_'):
             if not zig_zag(maze, current_var, current_x + 1, current_y):
+                assignments += 1
                 maze[current_y][current_x + 1] = current_var
                 found = backtrack(maze, current_var, start_x, start_y, current_x + 1, current_y, final_x, final_y, i, vars)
 
         # Finally, check the space below
         if (current_y + 1 < len(maze) and maze[current_y + 1][current_x] == '_'):
             if not zig_zag(maze, current_var, current_x, current_y + 1):
+                assignments += 1
                 maze[current_y + 1][current_x] = current_var
                 found = backtrack(maze, current_var, start_x, start_y, current_x, current_y + 1, final_x, final_y, i, vars)
 
@@ -217,6 +242,7 @@ def find_solution (maze, vars, i):
 # Main function that begins the flow solution
 def main():
     maze = []
+    global assignments
     
     # Menu that allows user to select a maze to run
     while True:
@@ -266,9 +292,11 @@ def main():
     time2 = time.time()
     run_time = time2 - time1
     print('\n')
+    print('Number of attempted assignments = ' + str(assignments))
     print('Run time in seconds = ' + str(run_time))
     print('\n')
     print_maze(maze)
+    write_to_file(maze, run_time, assignments)
 
 
 main()
